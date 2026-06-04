@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 // Get speech recognition constructor
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-export default function AIAssistant() {
+export default function AIAssistant({ openAllProjects }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -166,7 +166,11 @@ export default function AIAssistant() {
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
         setCommandFeedback("NAVIGATING: CONTACT_CHASSIS");
-        setTimeout(() => setCommandFeedback(""), 3000);
+        setTimeout(() => {
+          setCommandFeedback("");
+          const input = document.querySelector("#contact input[name='name']") || document.querySelector("#contact input[type='text']") || document.querySelector("#contact input");
+          if (input) input.focus();
+        }, 1000);
         return true;
       }
     }
@@ -185,6 +189,64 @@ export default function AIAssistant() {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setCommandFeedback("SYS_ACTION: SCROLL_UP");
       setTimeout(() => setCommandFeedback(""), 3000);
+      return true;
+    }
+
+    if (cmd.includes("show all projects") || cmd.includes("open all projects") || cmd.includes("projects catalog") || cmd.includes("view all projects") || cmd.includes("open gallery")) {
+      if (typeof openAllProjects === "function") {
+        setCommandFeedback("SYS_ACTION: OPEN_CATALOG");
+        setTimeout(() => {
+          setCommandFeedback("");
+          openAllProjects();
+        }, 1000);
+        return true;
+      }
+    }
+
+    if (cmd.includes("open github") || cmd.includes("go to github") || cmd.includes("view github") || cmd.includes("github profile")) {
+      setCommandFeedback("SYS_ACTION: OPEN_GITHUB");
+      setTimeout(() => {
+        setCommandFeedback("");
+        window.open("https://github.com/arpit6307", "_blank");
+      }, 1000);
+      return true;
+    }
+
+    if (cmd.includes("download resume") || cmd.includes("download cv") || cmd.includes("open resume") || cmd.includes("view resume") || cmd.includes("open cv") || cmd.includes("view cv")) {
+      setCommandFeedback("SYS_ACTION: DOWNLOAD_CV");
+      setTimeout(() => {
+        setCommandFeedback("");
+        window.open("/resume.pdf", "_blank");
+      }, 1000);
+      return true;
+    }
+
+    if (cmd.includes("mute voice") || cmd.includes("stop talking") || cmd.includes("mute assistant") || cmd.includes("disable voice") || cmd.includes("turn off audio")) {
+      setVoiceEnabled(false);
+      try {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+      } catch (e) {}
+      setCommandFeedback("AUDIO: MUTED");
+      setTimeout(() => setCommandFeedback(""), 2000);
+      return true;
+    }
+
+    if (cmd.includes("unmute voice") || cmd.includes("start talking") || cmd.includes("unmute assistant") || cmd.includes("enable voice") || cmd.includes("turn on audio") || cmd.includes("turn on sound")) {
+      setVoiceEnabled(true);
+      setCommandFeedback("AUDIO: ENABLED");
+      setTimeout(() => setCommandFeedback(""), 2000);
+      return true;
+    }
+
+    if (cmd.includes("close assistant") || cmd.includes("close terminal") || cmd.includes("bye") || cmd.includes("exit") || cmd.includes("minimize")) {
+      setCommandFeedback("SYS_STATUS: MINIMIZED");
+      setTimeout(() => {
+        setCommandFeedback("");
+        setIsOpen(false);
+        try {
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+        } catch (e) {}
+      }, 1000);
       return true;
     }
 
@@ -259,14 +321,20 @@ Professional Details of Arpit:
 - Experience: Worked as a Billing Accountant & Data Entry Specialist at Happinest Poultry Products Pvt. Ltd. (Audited 148,932 records with 100% precision, developed data entry layouts, audit logs, and ledger matrices).
 - Skills: Frontend (React, Vite, Tailwind CSS, Bootstrap CSS, GSAP ScrollTrigger, Framer Motion), Backend (Node.js, Express, MongoDB Atlas, FastAPI, JWT secure authentication), DevOps (Vercel edge pipelines, GitHub actions).
 - Persona/Tone: Cyberpunk administrator, professional, cool, and JARVIS-like. Keep answers brief, smart, and punchy.
-- Interactive voice commands and navigation: If the user asks to navigate, scroll to, show, or open a specific section, you MUST respond nicely and include the exact navigation tag in your answer:
+- Interactive voice commands and navigation: If the user asks to navigate, scroll to, show, open, download, or toggle a specific section/link/setting, you MUST respond nicely and include the exact tag in your answer:
   - For projects/portfolio: include [GOTO_PORTFOLIO]
   - For about: include [GOTO_ABOUT]
   - For services: include [GOTO_SERVICES]
   - For contact: include [GOTO_CONTACT]
   - For admin panel/login page: include [GOTO_ADMIN]
   - For top of page: include [GOTO_TOP]
-Examples: "Navigating to portfolio grid. [GOTO_PORTFOLIO]", "Affirmative. Displaying the about module. [GOTO_ABOUT]".
+  - For opening all projects overlay / portfolio catalog: include [OPEN_ALL_PROJECTS]
+  - For opening github profile: include [GOTO_GITHUB]
+  - For downloading/viewing resume or CV: include [DOWNLOAD_RESUME]
+  - For muting voice responses: include [MUTE_VOICE]
+  - For unmuting voice responses: include [UNMUTE_VOICE]
+  - For closing/minimizing the assistant terminal: include [CLOSE_BOT]
+Examples: "Navigating to portfolio grid. [GOTO_PORTFOLIO]", "Muting voice responses now Operator. [MUTE_VOICE]", "Opening the complete portfolio catalog. [OPEN_ALL_PROJECTS]".
 
 User query: ${textToSend}`
                   }
@@ -314,7 +382,11 @@ User query: ${textToSend}`
           if (el) {
             el.scrollIntoView({ behavior: "smooth" });
             setCommandFeedback("NAVIGATING: CONTACT_CHASSIS");
-            setTimeout(() => setCommandFeedback(""), 3000);
+            setTimeout(() => {
+              setCommandFeedback("");
+              const input = document.querySelector("#contact input[name='name']") || document.querySelector("#contact input[type='text']") || document.querySelector("#contact input");
+              if (input) input.focus();
+            }, 1000);
           }
         } else if (aiText.toLowerCase().includes("[goto_admin]")) {
           setCommandFeedback("SYS_REDIRECT: SECURE_LOGIN");
@@ -327,6 +399,46 @@ User query: ${textToSend}`
           window.scrollTo({ top: 0, behavior: "smooth" });
           setCommandFeedback("SYS_ACTION: SCROLL_UP");
           setTimeout(() => setCommandFeedback(""), 3000);
+        } else if (aiText.toLowerCase().includes("[open_all_projects]")) {
+          if (typeof openAllProjects === "function") {
+            setCommandFeedback("SYS_ACTION: OPEN_CATALOG");
+            setTimeout(() => {
+              setCommandFeedback("");
+              openAllProjects();
+            }, 1000);
+          }
+        } else if (aiText.toLowerCase().includes("[goto_github]")) {
+          setCommandFeedback("SYS_ACTION: OPEN_GITHUB");
+          setTimeout(() => {
+            setCommandFeedback("");
+            window.open("https://github.com/arpit6307", "_blank");
+          }, 1000);
+        } else if (aiText.toLowerCase().includes("[download_resume]")) {
+          setCommandFeedback("SYS_ACTION: DOWNLOAD_CV");
+          setTimeout(() => {
+            setCommandFeedback("");
+            window.open("/resume.pdf", "_blank");
+          }, 1000);
+        } else if (aiText.toLowerCase().includes("[mute_voice]")) {
+          setVoiceEnabled(false);
+          try {
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+          } catch (e) {}
+          setCommandFeedback("AUDIO: MUTED");
+          setTimeout(() => setCommandFeedback(""), 2000);
+        } else if (aiText.toLowerCase().includes("[unmute_voice]")) {
+          setVoiceEnabled(true);
+          setCommandFeedback("AUDIO: ENABLED");
+          setTimeout(() => setCommandFeedback(""), 2000);
+        } else if (aiText.toLowerCase().includes("[close_bot]")) {
+          setCommandFeedback("SYS_STATUS: MINIMIZED");
+          setTimeout(() => {
+            setCommandFeedback("");
+            setIsOpen(false);
+            try {
+              if (window.speechSynthesis) window.speechSynthesis.cancel();
+            } catch (e) {}
+          }, 1000);
         }
       } else if (resData.error) {
         aiText = `[SYS_ERR] API Error (${resData.error.code}): ${resData.error.message}`;
