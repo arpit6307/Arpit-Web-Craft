@@ -658,26 +658,29 @@ User query: ${textToSend}`
               if (isOpen && window.speechSynthesis) window.speechSynthesis.cancel();
             } catch (e) {}
           }}
-          className={`relative h-14 sm:h-16 w-8 sm:w-9 rounded-r-xl flex flex-col items-center justify-center bg-black/90 border-t border-r border-b cursor-pointer pointer-events-auto transition-all duration-300 focus:outline-none ${
+          className={`group relative h-20 sm:h-24 w-8 sm:w-9 hover:w-10 hover:sm:w-11 rounded-r-xl flex flex-col items-center justify-center bg-[#030712]/95 border-t border-r border-b cursor-pointer pointer-events-auto transition-all duration-300 ease-out focus:outline-none ${
             isOpen 
-              ? "border-red-500/40 shadow-[5px_0_20px_rgba(239,68,68,0.25)] text-red-400 bg-red-950/10" 
-              : "border-cyan-500/30 shadow-[5px_0_20px_rgba(6,182,212,0.25)] text-cyan-400 hover:border-cyan-400 hover:shadow-[5px_0_30px_rgba(6,182,212,0.35)]"
+              ? "border-red-500/50 shadow-[4px_0_20px_rgba(239,68,68,0.3)] text-red-400 bg-red-950/20" 
+              : "border-cyan-500/40 shadow-[4px_0_20px_rgba(6,182,212,0.25)] text-cyan-400 hover:border-cyan-400 hover:shadow-[6px_0_30px_rgba(6,182,212,0.45)]"
           }`}
           title={isOpen ? "Close AI Assistant" : "Open AI Assistant"}
         >
           {/* Cyberpunk ambient pulse indicator on the side */}
           {!isOpen && (
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-l-full bg-cyan-400 animate-pulse" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-l-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
           )}
 
           {isOpen ? (
             <FiChevronLeft className="w-5 h-5 text-red-400 animate-pulse" />
           ) : (
-            <div className="flex flex-col items-center gap-1.5">
-              <FiChevronRight className="w-4 h-4 text-cyan-400 animate-bounce" style={{ animationDuration: '2s' }} />
-              <FiCpu className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '10s' }} />
+            <div className="flex flex-col items-center gap-1.5 transition-all duration-300">
+              <FiChevronRight className="w-4 h-4 text-cyan-400 animate-bounce group-hover:text-cyan-300" style={{ animationDuration: '2s' }} />
+              <FiCpu className="w-4 h-4 text-cyan-400 group-hover:text-cyan-300 animate-spin group-hover:scale-110 transition-transform" style={{ animationDuration: '8s' }} />
+              <span className="text-[7px] font-black text-cyan-500/60 group-hover:text-cyan-400 tracking-[0.2em] [writing-mode:vertical-lr] uppercase select-none transition-colors duration-300 mt-1.5">
+                JARVIS
+              </span>
               {isListening && (
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.8)] mt-0.5" />
               )}
             </div>
           )}
@@ -692,14 +695,26 @@ User query: ${textToSend}`
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-36 left-4 sm:bottom-44 sm:left-8 w-[calc(100vw-32px)] sm:w-96 h-[480px] bg-[#070707]/95 border border-white/10 rounded-2xl flex flex-col z-[9998] shadow-2xl backdrop-blur-2xl font-mono select-none"
-            style={{ boxShadow: '0 0 50px rgba(6,182,212,0.1)' }}
+            className="fixed bottom-36 left-4 sm:bottom-44 sm:left-8 w-[calc(100vw-32px)] sm:w-96 h-[480px] bg-gradient-to-b from-[#060c16]/98 via-[#02050b]/98 to-[#040810]/98 border border-cyan-500/20 rounded-2xl flex flex-col z-[9998] shadow-2xl backdrop-blur-3xl font-mono select-none"
+            style={{ 
+              boxShadow: '0 0 50px rgba(6,182,212,0.2), inset 0 0 20px rgba(6,182,212,0.05)',
+              backgroundImage: 'radial-gradient(rgba(6, 182, 212, 0.08) 1px, transparent 0)',
+              backgroundSize: '16px 16px'
+            }}
           >
             {/* Hologram Brackets */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-500/50 rounded-tl" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-cyan-500/50 rounded-tr" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-cyan-500/50 rounded-bl" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-500/50 rounded-br" />
+            <div className={`absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 ${
+              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
+            } rounded-tl transition-colors duration-300`} />
+            <div className={`absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 ${
+              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
+            } rounded-tr transition-colors duration-300`} />
+            <div className={`absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 ${
+              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
+            } rounded-bl transition-colors duration-300`} />
+            <div className={`absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 ${
+              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
+            } rounded-br transition-colors duration-300`} />
 
             {/* Scanline Animation */}
             <div className="absolute inset-0 bg-radial-vignette opacity-20 pointer-events-none z-0" />
@@ -710,6 +725,14 @@ User query: ${textToSend}`
               <div className="flex items-center gap-2">
                 <FiTerminal className="text-cyan-400 w-3.5 h-3.5 animate-pulse" />
                 <span className="text-[10px] text-white tracking-widest font-black">SYS_ASSISTANT_V1</span>
+                
+                {/* Cyber Waveform Monitor */}
+                <div className="flex items-end gap-[2.5px] h-3 px-1.5 border-l border-white/10 ml-1 select-none">
+                  <span className={`w-[1.5px] rounded-full bg-cyan-400/70 transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-pulse h-3 bg-red-400" : sysStatus === "PROCESSING" ? "animate-bounce h-2 bg-amber-400" : "h-1"}`} style={{ animationDuration: '0.6s' }} />
+                  <span className={`w-[1.5px] rounded-full bg-cyan-400/70 transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-pulse h-1 bg-red-400" : sysStatus === "PROCESSING" ? "animate-bounce h-3 bg-amber-400" : "h-2"}`} style={{ animationDuration: '0.8s', animationDelay: '0.2s' }} />
+                  <span className={`w-[1.5px] rounded-full bg-cyan-400/70 transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-pulse h-2.5 bg-red-400" : sysStatus === "PROCESSING" ? "animate-bounce h-1.5 bg-amber-400" : "h-1.5"}`} style={{ animationDuration: '0.5s', animationDelay: '0.1s' }} />
+                  <span className={`w-[1.5px] rounded-full bg-cyan-400/70 transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-pulse h-1.5 bg-red-400" : sysStatus === "PROCESSING" ? "animate-bounce h-2.5 bg-amber-400" : "h-2.5"}`} style={{ animationDuration: '0.7s', animationDelay: '0.3s' }} />
+                </div>
               </div>
               
               {/* Status HUD */}
@@ -778,34 +801,39 @@ User query: ${textToSend}`
 
             {/* Messages Screen */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-none select-text relative z-10">
-              {messages.map((msg, i) => (
-                <div 
-                  key={i} 
-                  className={`flex flex-col max-w-[85%] ${
-                    msg.sender === "user" ? "ml-auto items-end" : "items-start"
-                  }`}
-                >
-                  {/* Sender Name tag */}
-                  <span className="text-[7px] text-gray-600 mb-1 tracking-widest uppercase">
-                    {msg.sender === "user" ? `OPERATOR // ${msg.time}` : `AI_SYSTEM // ${msg.time}`}
-                  </span>
-                  
-                  {/* Bubble content */}
-                  <div className={`px-3.5 py-2.5 rounded-xl border text-[10px] sm:text-xs leading-relaxed font-sans ${
-                    msg.sender === "user"
-                      ? "bg-cyan-950/10 border-cyan-500/20 text-white rounded-tr-none shadow-[0_0_15px_rgba(6,182,212,0.02)]"
-                      : "bg-[#0c0c0c] border-white/5 text-gray-300 rounded-tl-none"
-                  }`}>
-                    {msg.text}
-                  </div>
-                </div>
-              ))}
+              <AnimatePresence initial={false}>
+                {messages.map((msg, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className={`flex flex-col max-w-[85%] ${
+                      msg.sender === "user" ? "ml-auto items-end" : "items-start"
+                    }`}
+                  >
+                    {/* Sender Name tag */}
+                    <span className="text-[7px] text-gray-500 mb-1 tracking-widest uppercase select-none">
+                      {msg.sender === "user" ? `OPERATOR // ${msg.time}` : `AI_SYSTEM // ${msg.time}`}
+                    </span>
+                    
+                    {/* Bubble content */}
+                    <div className={`px-3.5 py-2.5 rounded-xl border text-[10px] sm:text-xs leading-relaxed font-sans transition-all duration-300 ${
+                      msg.sender === "user"
+                        ? "bg-cyan-950/20 border-cyan-500/30 text-white rounded-tr-none shadow-[0_0_15px_rgba(6,182,212,0.04)] focus:border-cyan-400"
+                        : "bg-[#090f1a]/85 border-white/5 text-gray-300 rounded-tl-none shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                    }`}>
+                      {msg.text}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
               
               {/* Processing Loader bubble */}
               {isProcessing && (
                 <div className="flex flex-col items-start max-w-[85%]">
                   <span className="text-[7px] text-gray-600 mb-1 tracking-widest uppercase">AI_SYSTEM // DECRYPTING</span>
-                  <div className="px-3.5 py-2.5 bg-[#0c0c0c] border border-white/5 rounded-xl rounded-tl-none flex items-center gap-1.5">
+                  <div className="px-3.5 py-2.5 bg-[#090f1a]/85 border border-white/5 rounded-xl rounded-tl-none flex items-center gap-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "0ms" }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -824,7 +852,7 @@ User query: ${textToSend}`
                 className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all cursor-pointer shrink-0 ${
                   isListening 
                     ? "bg-red-500/20 border-red-500/40 text-red-400 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.2)]" 
-                    : "bg-white/[0.02] border-white/10 hover:border-cyan-500/30 text-gray-400 hover:text-cyan-400"
+                    : "bg-[#090f1a]/50 border-white/10 hover:border-cyan-500/30 text-gray-400 hover:text-cyan-400"
                 }`}
                 title={isListening ? "Listening... click to stop" : "Start Voice command"}
               >
@@ -839,7 +867,7 @@ User query: ${textToSend}`
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder={isListening ? "Listening payload..." : "Initiate telemetry command..."}
-                  className="w-full bg-[#030303] border border-white/10 focus:border-cyan-500/50 rounded-lg p-2.5 pl-3 pr-8 text-[10px] text-white outline-none focus:outline-none placeholder-gray-600 transition-all font-mono"
+                  className="w-full bg-[#030712]/80 border border-white/10 focus:border-cyan-500/50 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] rounded-lg p-2.5 pl-3 pr-8 text-[10px] text-white outline-none focus:outline-none placeholder-gray-600 transition-all font-mono"
                 />
                 
                 {/* send trigger icon */}
