@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a14"/>
+      <stop offset="100%" stop-color="#060610"/>
+    </linearGradient>
+    <linearGradient id="aGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <rect x="3" y="3" width="506" height="506" rx="93" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.12"/>
+
+  <!-- Soft background glow -->
+  <ellipse cx="256" cy="280" rx="140" ry="160" fill="#06b6d4" opacity="0.04" filter="url(#softGlow)"/>
+
+  <!-- Geometric "A" lettermark — clean paths -->
+  <!-- Outer glow layer -->
+  <path d="M256 88 L400 400 L348 400 L316 320 L196 320 L164 400 L112 400 Z" 
+        fill="#22d3ee" opacity="0.15" filter="url(#softGlow)"/>
+  
+  <!-- Main "A" shape -->
+  <path d="M256 108 L388 392 L340 392 L310 318 L202 318 L172 392 L124 392 Z" 
+        fill="url(#aGrad)" filter="url(#glow)"/>
+  
+  <!-- Inner cutout (the triangle hole in A) -->
+  <path d="M256 192 L290 290 L222 290 Z" fill="url(#bg)"/>
+
+  <!-- Horizontal bar highlight -->
+  <rect x="210" y="282" width="92" height="4" rx="2" fill="#22d3ee" opacity="0.5"/>
+
+  <!-- Accent dot — bottom right -->
+  <circle cx="408" cy="392" r="14" fill="url(#accentGrad)" filter="url(#glow)"/>
+</svg>

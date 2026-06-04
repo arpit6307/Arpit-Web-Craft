@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ──────────────────────────────────────
+    // PROJECTS COLLECTION RULES
+    // ──────────────────────────────────────
+    // Portfolio visitors can view projects (read is public)
+    // Only logged-in admin can add, update, or delete projects
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ──────────────────────────────────────
+    // CONTACTS COLLECTION RULES
+    // ──────────────────────────────────────
+    // Anyone can submit the contact form (create is public)
+    // Only logged-in admin can read, mark read/unread, or delete messages
+    match /contacts/{contactId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}
