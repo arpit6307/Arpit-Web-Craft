@@ -238,9 +238,9 @@ export default function AIAssistant() {
     }
 
     try {
-      // Direct REST call to Gemini 1.5 Flash
+      // Direct REST call to Gemini 2.5 Flash
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: {
@@ -275,11 +275,15 @@ User query: ${textToSend}`
       );
 
       const resData = await response.json();
-      const rawResponse = resData.candidates?.[0]?.content?.parts?.[0]?.text;
       
-      const aiText = rawResponse 
-        ? rawResponse.trim()
-        : "[LINK_ERROR] Could not formulate response candidate. Core stream disconnected.";
+      let aiText = "";
+      if (resData.candidates?.[0]?.content?.parts?.[0]?.text) {
+        aiText = resData.candidates[0].content.parts[0].text.trim();
+      } else if (resData.error) {
+        aiText = `[SYS_ERR] API Error (${resData.error.code}): ${resData.error.message}`;
+      } else {
+        aiText = "[LINK_ERROR] Could not formulate response candidate. Core stream disconnected.";
+      }
 
       const aiMsg = {
         sender: "ai",
@@ -481,7 +485,7 @@ User query: ${textToSend}`
 
             {/* Telemetry info footer */}
             <div className="px-4 py-2 border-t border-white/5 flex items-center justify-between text-[7px] text-gray-600 tracking-wider">
-              <span>PROTOCOL: GEMINI-1.5-FLASH</span>
+              <span>PROTOCOL: GEMINI-2.5-FLASH</span>
               <span>BUFFER: STABLE</span>
             </div>
           </motion.div>
