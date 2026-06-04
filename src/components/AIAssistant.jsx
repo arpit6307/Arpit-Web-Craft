@@ -131,7 +131,7 @@ export default function AIAssistant() {
   const processVoiceCommand = (text) => {
     const cmd = text.toLowerCase().trim();
 
-    if (cmd.includes("show projects") || cmd.includes("open projects") || cmd.includes("view projects") || cmd.includes("portfolio")) {
+    if (cmd.includes("show projects") || cmd.includes("open projects") || cmd.includes("view projects") || cmd.includes("portfolio") || cmd.includes("go to projects") || cmd.includes("go to project") || cmd.includes("go projects") || cmd.includes("go project") || cmd.includes("projects section") || cmd.includes("project section")) {
       const el = document.getElementById("portfolio");
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
@@ -141,7 +141,7 @@ export default function AIAssistant() {
       }
     }
 
-    if (cmd.includes("show about") || cmd.includes("open about") || cmd.includes("view about")) {
+    if (cmd.includes("show about") || cmd.includes("open about") || cmd.includes("view about") || cmd.includes("go to about") || cmd.includes("go about") || cmd.includes("about section")) {
       const el = document.getElementById("about");
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
@@ -151,7 +151,7 @@ export default function AIAssistant() {
       }
     }
 
-    if (cmd.includes("show services") || cmd.includes("open services") || cmd.includes("view services")) {
+    if (cmd.includes("show services") || cmd.includes("open services") || cmd.includes("view services") || cmd.includes("go to services") || cmd.includes("go services") || cmd.includes("services section")) {
       const el = document.getElementById("services");
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
@@ -161,7 +161,7 @@ export default function AIAssistant() {
       }
     }
 
-    if (cmd.includes("show contact") || cmd.includes("open contact") || cmd.includes("view contact") || cmd.includes("send message")) {
+    if (cmd.includes("show contact") || cmd.includes("open contact") || cmd.includes("view contact") || cmd.includes("send message") || cmd.includes("go to contact") || cmd.includes("go contact") || cmd.includes("contact section")) {
       const el = document.getElementById("contact");
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
@@ -171,7 +171,7 @@ export default function AIAssistant() {
       }
     }
 
-    if (cmd.includes("open admin") || cmd.includes("login admin") || cmd.includes("admin panel")) {
+    if (cmd.includes("open admin") || cmd.includes("login admin") || cmd.includes("admin panel") || cmd.includes("go to admin") || cmd.includes("go admin")) {
       setCommandFeedback("SYS_REDIRECT: SECURE_LOGIN");
       setTimeout(() => {
         setCommandFeedback("");
@@ -181,7 +181,7 @@ export default function AIAssistant() {
       return true;
     }
 
-    if (cmd.includes("scroll top") || cmd.includes("go to top") || cmd.includes("scroll up")) {
+    if (cmd.includes("scroll top") || cmd.includes("go to top") || cmd.includes("scroll up") || cmd.includes("go top")) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setCommandFeedback("SYS_ACTION: SCROLL_UP");
       setTimeout(() => setCommandFeedback(""), 3000);
@@ -259,7 +259,14 @@ Professional Details of Arpit:
 - Experience: Worked as a Billing Accountant & Data Entry Specialist at Happinest Poultry Products Pvt. Ltd. (Audited 148,932 records with 100% precision, developed data entry layouts, audit logs, and ledger matrices).
 - Skills: Frontend (React, Vite, Tailwind CSS, Bootstrap CSS, GSAP ScrollTrigger, Framer Motion), Backend (Node.js, Express, MongoDB Atlas, FastAPI, JWT secure authentication), DevOps (Vercel edge pipelines, GitHub actions).
 - Persona/Tone: Cyberpunk administrator, professional, cool, and JARVIS-like. Keep answers brief, smart, and punchy.
-- Interactive voice commands you can tell the user to try (if they ask): "open projects", "open about", "open services", "open contact", "open admin".
+- Interactive voice commands and navigation: If the user asks to navigate, scroll to, show, or open a specific section, you MUST respond nicely and include the exact navigation tag in your answer:
+  - For projects/portfolio: include [GOTO_PORTFOLIO]
+  - For about: include [GOTO_ABOUT]
+  - For services: include [GOTO_SERVICES]
+  - For contact: include [GOTO_CONTACT]
+  - For admin panel/login page: include [GOTO_ADMIN]
+  - For top of page: include [GOTO_TOP]
+Examples: "Navigating to portfolio grid. [GOTO_PORTFOLIO]", "Affirmative. Displaying the about module. [GOTO_ABOUT]".
 
 User query: ${textToSend}`
                   }
@@ -279,6 +286,48 @@ User query: ${textToSend}`
       let aiText = "";
       if (resData.candidates?.[0]?.content?.parts?.[0]?.text) {
         aiText = resData.candidates[0].content.parts[0].text.trim();
+        
+        // Execute dynamic AI-driven navigation triggers
+        if (aiText.toLowerCase().includes("[goto_portfolio]")) {
+          const el = document.getElementById("portfolio");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+            setCommandFeedback("NAVIGATING: PORTFOLIO_GRID");
+            setTimeout(() => setCommandFeedback(""), 3000);
+          }
+        } else if (aiText.toLowerCase().includes("[goto_about]")) {
+          const el = document.getElementById("about");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+            setCommandFeedback("NAVIGATING: ABOUT_SECTION");
+            setTimeout(() => setCommandFeedback(""), 3000);
+          }
+        } else if (aiText.toLowerCase().includes("[goto_services]")) {
+          const el = document.getElementById("services");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+            setCommandFeedback("NAVIGATING: SERVICES_CORE");
+            setTimeout(() => setCommandFeedback(""), 3000);
+          }
+        } else if (aiText.toLowerCase().includes("[goto_contact]")) {
+          const el = document.getElementById("contact");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+            setCommandFeedback("NAVIGATING: CONTACT_CHASSIS");
+            setTimeout(() => setCommandFeedback(""), 3000);
+          }
+        } else if (aiText.toLowerCase().includes("[goto_admin]")) {
+          setCommandFeedback("SYS_REDIRECT: SECURE_LOGIN");
+          setTimeout(() => {
+            setCommandFeedback("");
+            setIsOpen(false);
+            navigate("/admin");
+          }, 1500);
+        } else if (aiText.toLowerCase().includes("[goto_top]")) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setCommandFeedback("SYS_ACTION: SCROLL_UP");
+          setTimeout(() => setCommandFeedback(""), 3000);
+        }
       } else if (resData.error) {
         aiText = `[SYS_ERR] API Error (${resData.error.code}): ${resData.error.message}`;
       } else {
