@@ -16,9 +16,9 @@ const FrameScrollAnimation = lazy(() => import('./components/FrameScrollAnimatio
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 
-// Admin pages — lazy loaded
-const AdminLogin = lazy(() => import('./admin/AdminLogin'));
-const AdminDashboard = lazy(() => import('./admin/AdminDashboard'));
+// Admin pages — eagerly loaded to prevent navigation delay and layout suspension
+import AdminLogin from './admin/AdminLogin';
+import AdminDashboard from './admin/AdminDashboard';
 
 // Reusable Home Layout Component
 const Home = ({ openAllProjects }) => {

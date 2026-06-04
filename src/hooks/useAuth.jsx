@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -56,9 +57,8 @@ export function ProtectedRoute({ children }) {
   }
 
   if (!user) {
-    // Redirect to admin login
-    window.location.href = "/admin";
-    return null;
+    // Redirect to admin login using client-side routing
+    return <Navigate to="/admin" replace />;
   }
 
   return children;
