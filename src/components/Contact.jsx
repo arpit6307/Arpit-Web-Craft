@@ -231,117 +231,117 @@ const Contact = () => {
           pointerEvents: hasScrolled ? "auto" : "none",
           transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
         }}
-        className="relative z-50 w-full max-w-xl px-3 sm:px-6 max-h-[85vh] sm:max-h-none overflow-y-auto sm:overflow-visible scrollbar-none"
-      >
-        {/* The Sci-Fi Chassis panel */}
-        <div 
-          className="relative bg-black/55 backdrop-blur-xl border border-white/10 p-4 sm:p-8 md:p-10 rounded-2xl overflow-hidden shadow-2xl"
-          style={{ boxShadow: '0 0 50px rgba(6,182,212,0.12)' }}
-        >
-          {/* Corner targeting brackets */}
-          <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-cyan-500/80 rounded-tl-lg" />
-          <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-cyan-500/80 rounded-tr-lg" />
-          <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-cyan-500/80 rounded-bl-lg" />
-          <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-cyan-500/80 rounded-br-lg" />
-          
-          {/* Tech background status grids */}
-          <div className="absolute top-4 right-4 text-[7px] text-gray-600 font-mono tracking-wider text-right uppercase pointer-events-none hidden sm:block select-none">
-            SYS.TYPE: DATA_IN<br/>
-            LOC: SEC.NODE.84<br/>
-            PORT: COM_SSL_256
-          </div>
-
-          <form ref={formRef} onSubmit={sendEmail} className="space-y-4 sm:space-y-6 select-text">
-            {/* Title */}
-            <div>
-              <h2 className="text-white text-base sm:text-lg md:text-2xl font-black uppercase tracking-widest border-b border-white/10 pb-2 sm:pb-3 flex items-center justify-between select-none">
-                <span>TRANSMIT_REQUEST</span>
-                <span className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-2 py-0.5 rounded uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-                  Secure Link
-                </span>
-              </h2>
-            </div>
-            
-            {/* Inputs Stack */}
-            <div className="space-y-3.5 sm:space-y-5">
-              {/* Name Input */}
-              <div className="space-y-1.5">
-                <div className="relative flex items-center">
-                  <FiUser className="absolute left-3 sm:left-4 text-cyan-500/70 w-4 h-4 pointer-events-none" />
-                  <input 
-                    name="name" 
-                    type="text" 
-                    placeholder="IDENTIFIER (NAME)" 
-                    required 
-                    value={formValues.name}
-                    onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                    className="w-full bg-white/[0.02] border border-white/10 focus:border-cyan-500/50 p-3 sm:p-3.5 pl-10 sm:pl-11 text-white text-xs outline-none focus:outline-none transition-all rounded-lg font-mono focus:shadow-[0_0_15px_rgba(6,182,212,0.06)]" 
-                  />
-                </div>
-                {/* Live input logger log */}
-                <div className="text-[8px] font-mono text-cyan-500/40 pl-2 uppercase tracking-widest select-none">
-                  {formValues.name ? `[ INPUT: "${formValues.name.slice(0, 15)}..." REGISTERED ]` : "> WAITING FOR NAME INPUT..."}
-                </div>
-              </div>
-
-              {/* Email Input */}
-              <div className="space-y-1.5">
-                <div className="relative flex items-center">
-                  <FiMail className="absolute left-3 sm:left-4 text-cyan-500/70 w-4 h-4 pointer-events-none" />
-                  <input 
-                    name="email" 
-                    type="email" 
-                    placeholder="COMM_CHANNEL (EMAIL)" 
-                    required 
-                    value={formValues.email}
-                    onChange={(e) => setFormValues({ ...formValues, email: e.target.value })}
-                    className="w-full bg-white/[0.02] border border-white/10 focus:border-cyan-500/50 p-3 sm:p-3.5 pl-10 sm:pl-11 text-white text-xs outline-none focus:outline-none transition-all rounded-lg font-mono focus:shadow-[0_0_15px_rgba(6,182,212,0.06)]" 
-                  />
-                </div>
-                {/* Live input logger log */}
-                <div className="text-[8px] font-mono text-cyan-500/40 pl-2 uppercase tracking-widest select-none">
-                  {formValues.email ? `[ ADDR: "${formValues.email.slice(0, 18)}" ACQUIRED ]` : "> WAITING FOR COM ADDRESS..."}
-                </div>
-              </div>
-
-              {/* Message Input */}
-              <div className="space-y-1.5">
-                <div className="relative flex">
-                  <FiMessageSquare className="absolute left-3 sm:left-4 top-3 sm:top-4 text-cyan-500/70 w-4 h-4 pointer-events-none" />
-                  <textarea 
-                    name="message" 
-                    placeholder="PROJECT_SPECIFICATIONS (MESSAGE)..." 
-                    required 
-                    value={formValues.message}
-                    onChange={(e) => setFormValues({ ...formValues, message: e.target.value })}
-                    className="w-full bg-white/[0.02] border border-white/10 focus:border-cyan-500/50 p-3 sm:p-3.5 pl-10 sm:pl-11 text-white text-xs outline-none focus:outline-none transition-all min-h-[80px] sm:min-h-[110px] rounded-lg font-mono resize-none focus:shadow-[0_0_15px_rgba(6,182,212,0.06)]" 
-                  />
-                </div>
-                {/* Live input logger log */}
-                <div className="text-[8px] font-mono text-cyan-500/40 pl-2 uppercase tracking-widest select-none">
-                  {formValues.message ? `[ PAYLOAD: ${formValues.message.length} BYTES STAGED ]` : "> WAITING FOR CORE PAYLOAD DESCRIPTION..."}
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Action */}
-            <button 
-              disabled={isSending}
-              type="submit" 
-              className="w-full py-3 sm:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-[10px] uppercase tracking-[0.4em] transition-all rounded-lg shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/25 relative overflow-hidden group/submit cursor-pointer"
+        className="relative z-50 w-full max-w-xl px-3 sm:px-6"
+          >
+            {/* The Sci-Fi Chassis panel */}
+            <div 
+              className="relative bg-black/55 backdrop-blur-xl border border-white/10 p-6 sm:p-10 rounded-2xl overflow-hidden shadow-2xl"
+              style={{ boxShadow: '0 0 50px rgba(6,182,212,0.12)' }}
             >
-              {/* Laser sweep line overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/submit:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+              {/* Corner targeting brackets */}
+              <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-cyan-500/80 rounded-tl-lg" />
+              <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-cyan-500/80 rounded-tr-lg" />
+              <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-cyan-500/80 rounded-bl-lg" />
+              <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-cyan-500/80 rounded-br-lg" />
               
-              <span className="relative z-10 flex items-center justify-center gap-2 select-none">
-                <FiSend className="w-3.5 h-3.5 animate-pulse" />
-                {isSending ? "TRANSMITTING DATA_PACKETS..." : "INITIATE BROADCAST"}
-              </span>
-            </button>
-          </form>
+              {/* Tech background status grids */}
+              <div className="absolute top-4 right-4 text-[7px] text-gray-600 font-mono tracking-wider text-right uppercase pointer-events-none hidden sm:block select-none">
+                SYS.TYPE: DATA_IN<br/>
+                LOC: SEC.NODE.84<br/>
+                PORT: COM_SSL_256
+              </div>
+
+              <form ref={formRef} onSubmit={sendEmail} className="space-y-6 select-text">
+                {/* Title */}
+                <div>
+                  <h2 className="text-white text-lg sm:text-2xl font-black uppercase tracking-widest border-b border-white/10 pb-3 flex items-center justify-between select-none">
+                    <span>TRANSMIT_REQUEST</span>
+                    <span className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-2 py-0.5 rounded uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                      Secure Link
+                    </span>
+                  </h2>
+                </div>
+                
+                {/* Inputs Stack */}
+                <div className="space-y-5">
+                  {/* Name Input */}
+                  <div className="space-y-1.5">
+                    <div className="relative flex items-center">
+                      <FiUser className="absolute left-4 text-cyan-500/70 w-4 h-4 pointer-events-none" />
+                      <input 
+                        name="name" 
+                        type="text" 
+                        placeholder="IDENTIFIER (NAME)" 
+                        required 
+                        value={formValues.name}
+                        onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
+                        className="w-full bg-white/[0.02] border border-white/10 focus:border-cyan-500/50 p-3.5 pl-11 text-white text-xs outline-none focus:outline-none transition-all rounded-lg font-mono focus:shadow-[0_0_15px_rgba(6,182,212,0.06)]" 
+                      />
+                    </div>
+                    {/* Live input logger log */}
+                    <div className="text-[8px] font-mono text-cyan-500/40 pl-2 uppercase tracking-widest select-none">
+                      {formValues.name ? `[ INPUT: "${formValues.name.slice(0, 15)}..." REGISTERED ]` : "> WAITING FOR NAME INPUT..."}
+                    </div>
+                  </div>
+
+                  {/* Email Input */}
+                  <div className="space-y-1.5">
+                    <div className="relative flex items-center">
+                      <FiMail className="absolute left-4 text-cyan-500/70 w-4 h-4 pointer-events-none" />
+                      <input 
+                        name="email" 
+                        type="email" 
+                        placeholder="COMM_CHANNEL (EMAIL)" 
+                        required 
+                        value={formValues.email}
+                        onChange={(e) => setFormValues({ ...formValues, email: e.target.value })}
+                        className="w-full bg-white/[0.02] border border-white/10 focus:border-cyan-500/50 p-3.5 pl-11 text-white text-xs outline-none focus:outline-none transition-all rounded-lg font-mono focus:shadow-[0_0_15px_rgba(6,182,212,0.06)]" 
+                      />
+                    </div>
+                    {/* Live input logger log */}
+                    <div className="text-[8px] font-mono text-cyan-500/40 pl-2 uppercase tracking-widest select-none">
+                      {formValues.email ? `[ ADDR: "${formValues.email.slice(0, 18)}" ACQUIRED ]` : "> WAITING FOR COM ADDRESS..."}
+                    </div>
+                  </div>
+
+                  {/* Message Input */}
+                  <div className="space-y-1.5">
+                    <div className="relative flex">
+                      <FiMessageSquare className="absolute left-4 top-4 text-cyan-500/70 w-4 h-4 pointer-events-none" />
+                      <textarea 
+                        name="message" 
+                        placeholder="PROJECT_SPECIFICATIONS (MESSAGE)..." 
+                        required 
+                        value={formValues.message}
+                        onChange={(e) => setFormValues({ ...formValues, message: e.target.value })}
+                        className="w-full bg-white/[0.02] border border-white/10 focus:border-cyan-500/50 p-3.5 pl-11 text-white text-xs outline-none focus:outline-none transition-all min-h-[110px] rounded-lg font-mono resize-none focus:shadow-[0_0_15px_rgba(6,182,212,0.06)]" 
+                      />
+                    </div>
+                    {/* Live input logger log */}
+                    <div className="text-[8px] font-mono text-cyan-500/40 pl-2 uppercase tracking-widest select-none">
+                      {formValues.message ? `[ PAYLOAD: ${formValues.message.length} BYTES STAGED ]` : "> WAITING FOR CORE PAYLOAD DESCRIPTION..."}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit Action */}
+                <button 
+                  disabled={isSending}
+                  type="submit" 
+                  className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-[10px] uppercase tracking-[0.4em] transition-all rounded-lg shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/25 relative overflow-hidden group/submit cursor-pointer"
+                >
+                  {/* Laser sweep line overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/submit:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+                  
+                  <span className="relative z-10 flex items-center justify-center gap-2 select-none">
+                    <FiSend className="w-3.5 h-3.5 animate-pulse" />
+                    {isSending ? "TRANSMITTING DATA_PACKETS..." : "INITIATE BROADCAST"}
+                  </span>
+                </button>
+              </form>
+          </div>
         </div>
-      </div>
 
       <ToastContainer position="bottom-right" theme="dark" toastClassName="bg-black/80 text-xs font-mono" />
     </div>
