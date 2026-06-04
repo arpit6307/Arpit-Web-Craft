@@ -5,6 +5,7 @@ import { FiX } from 'react-icons/fi';
 import Hero from './components/Hero';
 import Navbar from './components/Navbar';
 import ScrollToTop from './components/ScrollToTop';
+import AIAssistant from './components/AIAssistant';
 import { AuthProvider, ProtectedRoute } from './hooks/useAuth.jsx';
 
 // Lazy load non-critical sections for performance
@@ -72,6 +73,7 @@ function AppContent() {
     <>
       {!isAdminRoute && <Navbar />}
       {!isAdminRoute && <ScrollToTop />}
+      {!isAdminRoute && <AIAssistant />}
       
       <Suspense fallback={<div className="h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin"></div></div>}>
         <Routes>
