@@ -305,7 +305,7 @@ User query: ${textToSend}`
   };
 
   return (
-    <>
+    <div className="ai-assistant-wrapper">
       {/* ── pulsing neural AI assistant trigger orb ── */}
       <div className="fixed bottom-20 right-4 sm:bottom-28 sm:right-8 z-[9999]">
         <button
@@ -487,6 +487,6 @@ User query: ${textToSend}`
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
