@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
-  FiCpu, FiMic, FiMicOff, FiSend, FiVolume2, FiVolumeX, FiX, FiTerminal, FiNavigation
+  FiCpu, FiMic, FiMicOff, FiSend, FiVolume2, FiVolumeX, FiX, FiTerminal, FiNavigation, FiChevronRight, FiChevronLeft
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -648,8 +648,8 @@ User query: ${textToSend}`
 
   return (
     <div className="ai-assistant-wrapper">
-      {/* ── pulsing neural AI assistant trigger orb ── */}
-      <div className="fixed bottom-20 right-4 sm:bottom-28 sm:right-8 z-[9999]">
+      {/* ── Side trigger tab on the left edge ── */}
+      <div className="fixed bottom-24 left-0 sm:bottom-32 z-[9999]">
         <button
           onClick={() => {
             setIsOpen(!isOpen);
@@ -658,25 +658,26 @@ User query: ${textToSend}`
               if (isOpen && window.speechSynthesis) window.speechSynthesis.cancel();
             } catch (e) {}
           }}
-          className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-black border cursor-pointer pointer-events-auto transition-all duration-300 focus:outline-none ${
+          className={`relative h-14 sm:h-16 w-8 sm:w-9 rounded-r-xl flex flex-col items-center justify-center bg-black/90 border-t border-r border-b cursor-pointer pointer-events-auto transition-all duration-300 focus:outline-none ${
             isOpen 
-              ? "border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.3)] bg-red-950/10" 
-              : "border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.25)] hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]"
+              ? "border-red-500/40 shadow-[5px_0_20px_rgba(239,68,68,0.25)] text-red-400 bg-red-950/10" 
+              : "border-cyan-500/30 shadow-[5px_0_20px_rgba(6,182,212,0.25)] text-cyan-400 hover:border-cyan-400 hover:shadow-[5px_0_30px_rgba(6,182,212,0.35)]"
           }`}
-          title="Open AI Assistant"
+          title={isOpen ? "Close AI Assistant" : "Open AI Assistant"}
         >
-          {/* pulsing ring accent */}
+          {/* Cyberpunk ambient pulse indicator on the side */}
           {!isOpen && (
-            <div className="absolute inset-[-4px] rounded-full border border-cyan-500/20 animate-ping pointer-events-none" style={{ animationDuration: '2.5s' }} />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-l-full bg-cyan-400 animate-pulse" />
           )}
 
           {isOpen ? (
-            <FiX className="w-5 h-5 text-red-400" />
+            <FiChevronLeft className="w-5 h-5 text-red-400 animate-pulse" />
           ) : (
-            <div className="relative flex items-center justify-center">
-              <FiCpu className="w-5 h-5 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
+            <div className="flex flex-col items-center gap-1.5">
+              <FiChevronRight className="w-4 h-4 text-cyan-400 animate-bounce" style={{ animationDuration: '2s' }} />
+              <FiCpu className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '10s' }} />
               {isListening && (
-                <span className="absolute w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse -top-1.5 -right-1.5" />
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               )}
             </div>
           )}
@@ -691,7 +692,7 @@ User query: ${textToSend}`
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-36 right-4 sm:bottom-44 sm:right-8 w-[calc(100vw-32px)] sm:w-96 h-[480px] bg-[#070707]/95 border border-white/10 rounded-2xl flex flex-col z-[9998] shadow-2xl backdrop-blur-2xl font-mono select-none"
+            className="fixed bottom-36 left-4 sm:bottom-44 sm:left-8 w-[calc(100vw-32px)] sm:w-96 h-[480px] bg-[#070707]/95 border border-white/10 rounded-2xl flex flex-col z-[9998] shadow-2xl backdrop-blur-2xl font-mono select-none"
             style={{ boxShadow: '0 0 50px rgba(6,182,212,0.1)' }}
           >
             {/* Hologram Brackets */}
