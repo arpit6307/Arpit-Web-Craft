@@ -202,7 +202,14 @@ export default function Projects({ openAllProjects }) {
       {/* --- POPUP MODAL 1: DETAILED PROJECT INFORMATION PROFILE VIEW --- */}
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md" onClick={() => setSelectedProject(null)}>
+          <motion.div 
+            key="project-details-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md" 
+            onClick={() => setSelectedProject(null)}
+          >
             <motion.div 
               initial={{ opacity: 0, y: 20, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -283,14 +290,20 @@ export default function Projects({ openAllProjects }) {
                 </button>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* --- POPUP MODAL 2: FLOATING SAME-SCREEN LIVE DEMO IFRAME VIEW --- */}
       <AnimatePresence>
         {liveDemoUrl && (
-          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-sm">
+          <motion.div 
+            key="project-live-demo-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-sm"
+          >
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -328,7 +341,7 @@ export default function Projects({ openAllProjects }) {
                 />
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

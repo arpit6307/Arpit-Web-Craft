@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
-  FiCpu, FiMic, FiMicOff, FiSend, FiVolume2, FiVolumeX, FiX, FiTerminal, FiChevronUp, FiNavigation
+  FiCpu, FiMic, FiMicOff, FiSend, FiVolume2, FiVolumeX, FiX, FiTerminal, FiNavigation
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -33,60 +33,79 @@ export default function AIAssistant() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Initialize Speech Recognition
+  // Initialize Speech Recognition (runs once on mount)
   useEffect(() => {
     if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = "en-US";
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-US";
 
-      recognition.onstart = () => {
-        setIsListening(true);
-        setSysStatus("LISTENING");
-        setCommandFeedback("");
-      };
+        recognition.onstart = () => {
+          setIsListening(true);
+          setSysStatus("LISTENING");
+          setCommandFeedback("");
+        };
 
-      recognition.onend = () => {
-        setIsListening(false);
-        if (sysStatus === "LISTENING") setSysStatus("STANDBY");
-      };
+        recognition.onend = () => {
+          setIsListening(false);
+          setSysStatus((prev) => (prev === "LISTENING" ? "STANDBY" : prev));
+        };
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInputValue(transcript);
-        handleSend(transcript);
-      };
+        recognition.onresult = (event) => {
+          try {
+            const transcript = event.results[0][0].transcript;
+            handleSend(transcript);
+          } catch (err) {
+            console.error("Speech recognition result parsing failed:", err);
+          }
+        };
 
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-        setIsListening(false);
-        setSysStatus("STANDBY");
-      };
+        recognition.onerror = (event) => {
+          console.error("Speech recognition error:", event.error);
+          setIsListening(false);
+          setSysStatus("STANDBY");
+        };
 
-      recognitionRef.current = recognition;
+        recognitionRef.current = recognition;
+      } catch (err) {
+        console.error("Speech recognition instantiation failed:", err);
+      }
     }
-  }, [sysStatus]);
+  }, []);
 
-  // Handle TTS (Text to Speech)
+  // Handle Text to Speech (TTS) safely with try-catch
   const speakText = (text) => {
-    if (!voiceEnabled || !window.speechSynthesis) return;
+    try {
+      if (!voiceEnabled || !window.speechSynthesis) return;
 
-    window.speechSynthesis.cancel(); // cancel any active speaking
+      window.speechSynthesis.cancel(); // Cancel active speaking
 
-    // Remove status brackets like [SYS_BOOT] for cleaner reading
-    const cleanText = text.replace(/\[.*?\]/g, "").trim();
+      // Remove bracket logs like [SYS_BOOT] for cleaner reading
+      const cleanText = text.replace(/\[.*?\]/g, "").trim();
+      const utterance = new SpeechSynthesisUtterance(cleanText);
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    const voices = window.speechSynthesis.getVoices();
-    // Try to find a crisp natural or Google English voice
-    const voice = voices.find(v => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural"))) || voices[0];
-    
-    if (voice) utterance.voice = voice;
-    utterance.pitch = 0.9; // JARVIS-like tech pitch
-    utterance.rate = 1.05; // Slightly faster for slick cyber feel
-    
-    window.speechSynthesis.speak(utterance);
+      // Fetch voices safely
+      if (typeof window.speechSynthesis.getVoices === "function") {
+        const voices = window.speechSynthesis.getVoices() || [];
+        if (voices.length > 0) {
+          const voice = voices.find(
+            (v) =>
+              v.lang &&
+              v.lang.startsWith("en") &&
+              (v.name.includes("Google") || v.name.includes("Natural"))
+          ) || voices[0];
+          if (voice) utterance.voice = voice;
+        }
+      }
+
+      utterance.pitch = 0.9; // Cyberpunk pitch setting
+      utterance.rate = 1.05; // Telemetry response rate
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.warn("Speech synthesis failed to execute:", err);
+    }
   };
 
   const toggleListening = () => {
@@ -95,10 +114,16 @@ export default function AIAssistant() {
       return;
     }
 
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
-      recognitionRef.current.start();
+    try {
+      if (isListening) {
+        recognitionRef.current.stop();
+      } else {
+        recognitionRef.current.start();
+      }
+    } catch (err) {
+      console.error("Failed to toggle speech recognition:", err);
+      setIsListening(false);
+      setSysStatus("STANDBY");
     }
   };
 
@@ -199,7 +224,7 @@ export default function AIAssistant() {
 
     // Call Gemini API
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === "YOUR_GEMINI_API_KEY_HERE") {
+    if (!apiKey || apiKey === "YOUR_GEMINI_API_KEY_HERE" || apiKey.includes("YOUR_")) {
       const errorMsg = {
         sender: "ai",
         text: "[SYS_ERR] VITE_GEMINI_API_KEY is not configured in .env. Please configure your key in Google AI Studio to initiate AI conversation.",
@@ -213,7 +238,7 @@ export default function AIAssistant() {
     }
 
     try {
-      // Direct REST call to Gemini 1.5 Flash (lightweight, highly responsive)
+      // Direct REST call to Gemini 1.5 Flash
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
@@ -287,7 +312,9 @@ User query: ${textToSend}`
           onClick={() => {
             setIsOpen(!isOpen);
             // Cancel speaking if we close the bot
-            if (isOpen && window.speechSynthesis) window.speechSynthesis.cancel();
+            try {
+              if (isOpen && window.speechSynthesis) window.speechSynthesis.cancel();
+            } catch (e) {}
           }}
           className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-black border cursor-pointer pointer-events-auto transition-all duration-300 focus:outline-none ${
             isOpen 
@@ -314,10 +341,10 @@ User query: ${textToSend}`
         </button>
       </div>
 
-      {/* ── AI Terminal Panel Drawer ── */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            key="ai-assistant-terminal-drawer"
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -352,7 +379,9 @@ User query: ${textToSend}`
                 <button
                   onClick={() => {
                     setVoiceEnabled(!voiceEnabled);
-                    if (voiceEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+                    try {
+                      if (voiceEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+                    } catch (e) {}
                   }}
                   className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
                     voiceEnabled 
@@ -368,7 +397,7 @@ User query: ${textToSend}`
 
             {/* Voice Command Feedback Bar */}
             {commandFeedback && (
-              <div className="bg-cyan-500/10 border-b border-cyan-500/20 px-4 py-1.5 flex items-center gap-2 text-[8px] text-cyan-400 tracking-wider relative z-10 animate-slideDown">
+              <div className="bg-cyan-500/10 border-b border-cyan-500/20 px-4 py-1.5 flex items-center gap-2 text-[8px] text-cyan-400 tracking-wider relative z-10">
                 <FiNavigation className="animate-spin" size={10} />
                 <span>{commandFeedback}</span>
               </div>
@@ -385,7 +414,7 @@ User query: ${textToSend}`
                 >
                   {/* Sender Name tag */}
                   <span className="text-[7px] text-gray-600 mb-1 tracking-widest uppercase">
-                    {msg.sender === "user" ? "OPERATOR" : "AI_SYSTEM"} // {msg.time}
+                    {msg.sender === "user" ? `OPERATOR // ${msg.time}` : `AI_SYSTEM // ${msg.time}`}
                   </span>
                   
                   {/* Bubble content */}
