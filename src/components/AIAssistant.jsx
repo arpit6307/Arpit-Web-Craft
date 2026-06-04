@@ -648,26 +648,8 @@ User query: ${textToSend}`
 
   return (
     <div className="ai-assistant-wrapper">
-      {/* Custom CSS Keyframe Injection */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin-reverse {
-          from { transform: rotate(360deg); }
-          to { transform: rotate(0deg); }
-        }
-        .animate-spin-reverse {
-          animation: spin-reverse 10s linear infinite;
-        }
-        @keyframes scanline {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(100%); }
-        }
-        .animate-scanline {
-          animation: scanline 8s linear infinite;
-        }
-      `}} />
-
-      {/* ── Holographic Concentric AI Core Trigger Orb ── */}
-      <div className="fixed bottom-20 left-4 sm:bottom-28 sm:left-8 z-[9999]">
+      {/* ── Subtle Semi-Hidden Edge Trigger Tab ── */}
+      <div className="fixed top-[60%] left-0 z-[9999]">
         <button
           onClick={() => {
             setIsOpen(!isOpen);
@@ -676,55 +658,25 @@ User query: ${textToSend}`
               if (isOpen && window.speechSynthesis) window.speechSynthesis.cancel();
             } catch (e) {}
           }}
-          className="group relative w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center bg-black/90 cursor-pointer pointer-events-auto transition-all duration-300 focus:outline-none select-none border border-white/5"
+          className={`group relative h-16 w-2 hover:w-8 sm:w-2.5 sm:hover:w-9 rounded-r-lg flex items-center justify-center bg-black/30 hover:bg-black/80 backdrop-blur-sm border-t border-r border-b cursor-pointer pointer-events-auto transition-all duration-300 ease-in-out focus:outline-none select-none opacity-15 hover:opacity-100 ${
+            isOpen 
+              ? "border-red-500/20 text-red-400 bg-red-950/10 opacity-100" 
+              : "border-white/5 text-gray-500 hover:text-cyan-400 hover:border-cyan-500/30 hover:shadow-[3px_0_15px_rgba(6,182,212,0.15)]"
+          }`}
           title={isOpen ? "Close AI Assistant" : "Open AI Assistant"}
         >
-          {/* Glowing Aura shadow base */}
-          <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
-            isOpen 
-              ? "bg-red-500/20 shadow-[0_0_25px_rgba(239,68,68,0.4)]" 
-              : "bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.3)] group-hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
-          }`} />
-
-          {/* Outer Ring: rotates clockwise */}
-          <div className={`absolute inset-[-5px] rounded-full border border-dashed animate-spin transition-colors duration-300 ${
-            isOpen ? "border-red-500/30" : "border-cyan-500/40 group-hover:border-cyan-300"
-          }`} style={{ animationDuration: '16s' }} />
-
-          {/* Inner Ring: double border, rotates counter-clockwise */}
-          <div className={`absolute inset-[-1px] rounded-full border-2 border-double animate-spin-reverse transition-colors duration-300 ${
-            isOpen ? "border-red-500/20" : "border-cyan-500/30 group-hover:border-cyan-400"
-          }`} style={{ animationDuration: '8s' }} />
-
-          {/* Ping ripples when recording */}
-          {isListening && (
-            <div className="absolute inset-[-8px] rounded-full border border-red-500/40 animate-ping pointer-events-none" style={{ animationDuration: '1.8s' }} />
+          {isOpen ? (
+            <FiChevronLeft className="w-3.5 h-3.5 text-red-400 animate-pulse hidden group-hover:block" />
+          ) : (
+            <div className="flex flex-col items-center justify-center">
+              {/* Subtle indicator dot when closed and not hovered */}
+              <div className={`w-1 h-1 rounded-full group-hover:hidden transition-colors ${
+                isListening ? "bg-red-500 animate-ping" : "bg-cyan-500/70"
+              }`} />
+              {/* Chevron icon revealed on hover */}
+              <FiChevronRight className="w-3.5 h-3.5 text-cyan-400 hidden group-hover:block animate-pulse" />
+            </div>
           )}
-
-          {/* Central Pulsing Hologram Core */}
-          <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex flex-col items-center justify-center bg-gradient-to-tr transition-all duration-300 ${
-            isOpen 
-              ? "from-red-600/90 to-rose-500/90 text-white" 
-              : isListening 
-                ? "from-red-600/90 to-rose-500/90 text-white animate-pulse" 
-                : isProcessing 
-                  ? "from-amber-600/90 to-yellow-500/90 text-white animate-pulse" 
-                  : "from-cyan-600/90 to-blue-500/90 text-white hover:scale-105"
-          }`}>
-            {isOpen ? (
-              <FiX className="w-5 h-5 text-white animate-pulse" />
-            ) : (
-              <div className="relative flex flex-col items-center justify-center">
-                <FiCpu className={`w-5 h-5 text-white ${isListening ? "animate-bounce" : "animate-spin"}`} style={{ animationDuration: isListening ? '1.5s' : '10s' }} />
-                <span className="text-[5px] text-white/80 font-black tracking-widest uppercase mt-0.5 scale-90 select-none">
-                  JARVIS
-                </span>
-                {isListening && (
-                  <span className="absolute w-2 h-2 rounded-full bg-red-400 -top-1 -right-1 border border-white" />
-                )}
-              </div>
-            )}
-          </div>
         </button>
       </div>
 
@@ -736,43 +688,24 @@ User query: ${textToSend}`
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-36 left-4 sm:bottom-44 sm:left-8 w-[calc(100vw-32px)] sm:w-96 h-[480px] bg-gradient-to-b from-[#060c16]/98 via-[#02050b]/98 to-[#040810]/98 border border-cyan-500/25 rounded-2xl flex flex-col z-[9998] shadow-2xl backdrop-blur-3xl font-mono select-none overflow-hidden"
-            style={{ 
-              boxShadow: '0 0 50px rgba(6,182,212,0.22), inset 0 0 20px rgba(6,182,212,0.05)',
-              backgroundImage: 'radial-gradient(rgba(6, 182, 212, 0.06) 1.5px, transparent 0)',
-              backgroundSize: '15px 15px'
-            }}
+            className="fixed bottom-36 left-4 sm:bottom-44 sm:left-8 w-[calc(100vw-32px)] sm:w-96 h-[480px] bg-[#070707]/95 border border-white/10 rounded-2xl flex flex-col z-[9998] shadow-2xl backdrop-blur-2xl font-mono select-none"
+            style={{ boxShadow: '0 0 50px rgba(6,182,212,0.1)' }}
           >
             {/* Hologram Brackets */}
-            <div className={`absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 ${
-              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
-            } rounded-tl transition-colors duration-300 z-20`} />
-            <div className={`absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 ${
-              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
-            } rounded-tr transition-colors duration-300 z-20`} />
-            <div className={`absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 ${
-              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
-            } rounded-bl transition-colors duration-300 z-20`} />
-            <div className={`absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 ${
-              sysStatus === "LISTENING" ? "border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : sysStatus === "PROCESSING" ? "border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"
-            } rounded-br transition-colors duration-300 z-20`} />
+            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-500/50 rounded-tl animate-pulse" />
+            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-cyan-500/50 rounded-tr animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-cyan-500/50 rounded-bl animate-pulse" />
+            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-500/50 rounded-br animate-pulse" />
 
-            {/* Scrolling Telemetry Scanline Sweep */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-cyan-500/10 shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-scanline pointer-events-none z-10" />
+            {/* Scanline Animation */}
+            <div className="absolute inset-0 bg-radial-vignette opacity-20 pointer-events-none z-0" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent animate-pulse pointer-events-none" />
 
             {/* Terminal Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/[0.01] relative z-10">
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5 bg-white/[0.01] relative z-10">
               <div className="flex items-center gap-2">
                 <FiTerminal className="text-cyan-400 w-3.5 h-3.5 animate-pulse" />
                 <span className="text-[10px] text-white tracking-widest font-black">SYS_ASSISTANT_V1</span>
-                
-                {/* Responsive Waveform Monitor widget */}
-                <div className="flex items-end gap-[2px] h-3.5 px-1.5 border-l border-white/10 ml-1 select-none">
-                  <span className={`w-[1.5px] rounded-full transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-bounce bg-red-400 h-3.5" : sysStatus === "PROCESSING" ? "animate-bounce bg-amber-400 h-2.5" : "bg-cyan-500/40 h-1.5"}`} style={{ animationDuration: '0.5s' }} />
-                  <span className={`w-[1.5px] rounded-full transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-bounce bg-red-400 h-2" : sysStatus === "PROCESSING" ? "animate-bounce bg-amber-400 h-4" : "bg-cyan-500/40 h-2.5"}`} style={{ animationDuration: '0.7s', animationDelay: '0.15s' }} />
-                  <span className={`w-[1.5px] rounded-full transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-bounce bg-red-400 h-4" : sysStatus === "PROCESSING" ? "animate-bounce bg-amber-400 h-2" : "bg-cyan-500/40 h-2"}`} style={{ animationDuration: '0.4s', animationDelay: '0.05s' }} />
-                  <span className={`w-[1.5px] rounded-full transition-all duration-300 ${sysStatus === "LISTENING" ? "animate-bounce bg-red-400 h-1.5" : sysStatus === "PROCESSING" ? "animate-bounce bg-amber-400 h-3" : "bg-cyan-500/40 h-3"}`} style={{ animationDuration: '0.6s', animationDelay: '0.2s' }} />
-                </div>
               </div>
               
               {/* Status HUD */}
@@ -831,19 +764,6 @@ User query: ${textToSend}`
               </div>
             </div>
 
-            {/* Telemetry Display Panel */}
-            <div className="flex justify-between items-center bg-cyan-950/15 border-b border-cyan-500/10 px-4 py-2 text-[7px] text-cyan-400/70 tracking-widest relative z-10 select-none">
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-                <span>LINK: SECURE</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>BUFFER: STABLE</span>
-                <span>SIG: 94%</span>
-                <span>CPU: OK</span>
-              </div>
-            </div>
-
             {/* Voice Command Feedback Bar */}
             {commandFeedback && (
               <div className="bg-cyan-500/10 border-b border-cyan-500/20 px-4 py-1.5 flex items-center gap-2 text-[8px] text-cyan-400 tracking-wider relative z-10">
@@ -874,7 +794,7 @@ User query: ${textToSend}`
                     <div className={`px-3.5 py-2.5 rounded-xl border text-[10px] sm:text-xs leading-relaxed font-sans transition-all duration-300 ${
                       msg.sender === "user"
                         ? "bg-cyan-950/20 border-cyan-500/30 text-white rounded-tr-none shadow-[0_0_15px_rgba(6,182,212,0.04)] focus:border-cyan-400"
-                        : "bg-[#090f1a]/85 border-white/5 text-gray-300 rounded-tl-none shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                        : "bg-[#0c0c0c] border-white/5 text-gray-300 rounded-tl-none"
                     }`}>
                       {msg.text}
                     </div>
@@ -886,7 +806,7 @@ User query: ${textToSend}`
               {isProcessing && (
                 <div className="flex flex-col items-start max-w-[85%]">
                   <span className="text-[7px] text-gray-600 mb-1 tracking-widest uppercase">AI_SYSTEM // DECRYPTING</span>
-                  <div className="px-3.5 py-2.5 bg-[#090f1a]/85 border border-white/5 rounded-xl rounded-tl-none flex items-center gap-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                  <div className="px-3.5 py-2.5 bg-[#0c0c0c] border border-white/5 rounded-xl rounded-tl-none flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "0ms" }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -905,7 +825,7 @@ User query: ${textToSend}`
                 className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all cursor-pointer shrink-0 ${
                   isListening 
                     ? "bg-red-500/20 border-red-500/40 text-red-400 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.2)]" 
-                    : "bg-[#090f1a]/50 border-white/10 hover:border-cyan-500/30 text-gray-400 hover:text-cyan-400"
+                    : "bg-white/[0.02] border-white/10 hover:border-cyan-500/30 text-gray-400 hover:text-cyan-400"
                 }`}
                 title={isListening ? "Listening... click to stop" : "Start Voice command"}
               >
@@ -914,14 +834,13 @@ User query: ${textToSend}`
 
               {/* text input */}
               <div className="flex-1 relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400/70 text-[10px] font-bold pointer-events-none select-none">&gt;</span>
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder={isListening ? "Listening payload..." : "Initiate telemetry command..."}
-                  className="w-full bg-[#030712]/80 border border-white/10 focus:border-cyan-500/50 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] rounded-lg p-2.5 pl-6 pr-8 text-[10px] text-white outline-none focus:outline-none placeholder-gray-600 transition-all font-mono"
+                  className="w-full bg-[#030303] border border-white/10 focus:border-cyan-500/50 rounded-lg p-2.5 pl-3 pr-8 text-[10px] text-white outline-none focus:outline-none placeholder-gray-600 transition-all font-mono"
                 />
                 
                 {/* send trigger icon */}
