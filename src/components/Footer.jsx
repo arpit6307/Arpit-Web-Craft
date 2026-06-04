@@ -14,6 +14,10 @@ import {
 } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Footer = ({ onClose }) => {
   const [systemTime, setSystemTime] = useState('');
@@ -156,7 +160,15 @@ const Footer = ({ onClose }) => {
               
               {/* Admin Panel Link */}
               <a 
-                onClick={() => navigate('/admin')} 
+                onClick={() => {
+                  ScrollTrigger.getAll().forEach(t => t.revert());
+                  document.body.style.overflow = '';
+                  document.body.style.position = '';
+                  document.body.style.top = '';
+                  document.body.style.width = '';
+                  document.documentElement.style.overflow = '';
+                  navigate('/admin');
+                }} 
                 onMouseEnter={() => setActiveDiagnostic({ href: '/admin', file: 'src/admin/AdminDashboard.jsx' })}
                 onMouseLeave={() => setActiveDiagnostic(null)}
                 className="hover:text-cyan-400 transition-all flex items-center gap-2 group w-fit cursor-pointer text-gray-500"

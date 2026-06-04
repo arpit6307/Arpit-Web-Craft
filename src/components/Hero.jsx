@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,11 @@ export default function Hero() {
   const [hasScrolled, setHasScrolled] = useState(false);
   
   const [currentFrameIdx, setCurrentFrameIdx] = useState(0);
+  
+  const textContainerRef = useRef(null);
+  const roleWrapperRef = useRef(null);
+  const subtitleWrapperRef = useRef(null);
+  const highlightWrapperRef = useRef(null);
 
   const frameCount = 240;
   const currentFrame = (index) => `/images/ezgif-frame-${(index + 1).toString().padStart(3, '0')}.jpg`;
@@ -54,7 +59,7 @@ export default function Hero() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!loaded) return;
     
     const canvas = canvasRef.current;
@@ -104,8 +109,22 @@ export default function Hero() {
       // HUD Elements sequence
       bootTl.fromTo('.hud-element', { opacity: 0 }, { opacity: 1, duration: 0.1, stagger: 0.1, ease: "none" }, 1.2);
 
-      // Social Icons Bottom Left
-      bootTl.fromTo('.social-icon', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.2, stagger: 0.1, ease: "none" }, 1.4);
+      // Robotic Text Sequence
+      if (textContainerRef.current) {
+          // LEESHARK chars glitch/stagger in
+          bootTl.to('.title-char', { opacity: 1, x: 0, duration: 0.05, stagger: 0.05, ease: "none" }, 1.5);
+          
+          // Full Stack Developer
+          bootTl.fromTo(roleWrapperRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "none" }, 2.0);
+          bootTl.fromTo('.role-underline', { scaleX: 0, transformOrigin: "left" }, { scaleX: 1, duration: 0.3, ease: "none" }, 2.2);
+
+          // Right Content
+          bootTl.fromTo(subtitleWrapperRef.current, { opacity: 0, x: 50 }, { opacity: 1, x: 0, duration: 0.3, ease: "none" }, 2.4);
+          bootTl.fromTo(highlightWrapperRef.current, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.2, ease: "none" }, 2.6);
+
+          // Social Icons Bottom Left
+          bootTl.fromTo('.social-icon', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.2, stagger: 0.1, ease: "none" }, 2.8);
+      }
 
       // --- 2. MAIN SCROLL CONTINUATION ---
       // User scroll takes over from whatever frame bootTl left off at, up to 239.

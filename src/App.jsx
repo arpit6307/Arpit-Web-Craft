@@ -2,15 +2,10 @@ import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX } from 'react-icons/fi';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Hero from './components/Hero';
 import Navbar from './components/Navbar';
 import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider, ProtectedRoute } from './hooks/useAuth.jsx';
-
-gsap.registerPlugin(ScrollTrigger);
-gsap.config({ nullTargetWarn: false });
 
 // Lazy load non-critical sections for performance
 const About = lazy(() => import('./components/About'));
@@ -53,18 +48,6 @@ function AppContent() {
   const [isAllProjectsOpen, setIsAllProjectsOpen] = useState(false);
 
   useEffect(() => {
-    if (location.pathname !== '/') {
-      // Kill all active GSAP ScrollTriggers to release pinned scroll states when leaving home
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-
-      // Reset body style properties that might be locked by GSAP pinning
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.documentElement.style.overflow = '';
-    }
-
     if (location.pathname === '/') {
       if (location.hash) {
         const scrollTarget = location.hash;

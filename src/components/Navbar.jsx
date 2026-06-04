@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FiMenu, FiX, FiDownload, FiMail, FiMessageCircle, FiCpu, FiTerminal } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -160,7 +164,15 @@ export default function Navbar() {
             {/* Action Port Button */}
             <div className="flex items-center border-l border-white/10 pl-8 h-6 relative select-none gap-4">
               <button 
-                onClick={() => navigate('/admin')} 
+                onClick={() => {
+                  ScrollTrigger.getAll().forEach(t => t.revert());
+                  document.body.style.overflow = '';
+                  document.body.style.position = '';
+                  document.body.style.top = '';
+                  document.body.style.width = '';
+                  document.documentElement.style.overflow = '';
+                  navigate('/admin');
+                }} 
                 className="relative px-4 py-2 overflow-hidden border border-white/15 text-white/60 hover:text-cyan-400 font-mono text-[9px] uppercase tracking-[0.25em] bg-white/[0.02] hover:bg-cyan-950/20 rounded-lg transition-all duration-300 group/admin cursor-pointer"
               >
                 <span className="relative z-10 flex items-center gap-1.5">
@@ -329,8 +341,17 @@ export default function Navbar() {
               >
                 Hire Me
               </button>
-              <button 
-                onClick={() => { setIsMobileMenuOpen(false); navigate('/admin'); }} 
+               <button 
+                onClick={() => { 
+                  setIsMobileMenuOpen(false); 
+                  ScrollTrigger.getAll().forEach(t => t.revert());
+                  document.body.style.overflow = '';
+                  document.body.style.position = '';
+                  document.body.style.top = '';
+                  document.body.style.width = '';
+                  document.documentElement.style.overflow = '';
+                  navigate('/admin'); 
+                }} 
                 className="w-full max-w-xs py-3 border border-white/10 text-white/60 hover:text-white font-mono text-[9px] uppercase tracking-[0.3em] bg-white/[0.02] rounded-lg mt-1"
               >
                 Admin Panel
