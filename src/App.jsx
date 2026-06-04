@@ -53,15 +53,17 @@ function AppContent() {
   const [isAllProjectsOpen, setIsAllProjectsOpen] = useState(false);
 
   useEffect(() => {
-    // Kill all active GSAP ScrollTriggers to release pinned scroll states
-    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    if (location.pathname !== '/') {
+      // Kill all active GSAP ScrollTriggers to release pinned scroll states when leaving home
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
 
-    // Reset body style properties that might be locked by GSAP pinning
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    document.documentElement.style.overflow = '';
+      // Reset body style properties that might be locked by GSAP pinning
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+    }
 
     if (location.pathname === '/') {
       if (location.hash) {
