@@ -21,12 +21,46 @@ export default function AIAssistant({ openAllProjects, closeAllProjects, isAllPr
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [jarvisMode, setJarvisMode] = useState(true); // Continuous Jarvis mode by default
   const [sysStatus, setSysStatus] = useState("STANDBY");
   const [commandFeedback, setCommandFeedback] = useState("");
 
   const navigate = useNavigate();
   const chatEndRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  // References to keep callbacks current and prevent stale closures
+  const jarvisModeRef = useRef(jarvisMode);
+  const isOpenRef = useRef(isOpen);
+  const isProcessingRef = useRef(isProcessing);
+  const isListeningRef = useRef(isListening);
+  const isSpeakingRef = useRef(false);
+
+  useEffect(() => {
+    jarvisModeRef.current = jarvisMode;
+  }, [jarvisMode]);
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+    if (!isOpen) {
+      isSpeakingRef.current = false;
+      isProcessingRef.current = false;
+      // Ensure we immediately start background wake-word listening when closed
+      if (jarvisModeRef.current && !isListeningRef.current && recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+        } catch (e) {}
+      }
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    isProcessingRef.current = isProcessing;
+  }, [isProcessing]);
+
+  useEffect(() => {
+    isListeningRef.current = isListening;
+  }, [isListening]);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
@@ -50,35 +84,130 @@ export default function AIAssistant({ openAllProjects, closeAllProjects, isAllPr
 
         recognition.onend = () => {
           setIsListening(false);
-          setSysStatus((prev) => (prev === "LISTENING" ? "STANDBY" : prev));
+          // If Jarvis mode is active, and we are not speaking/processing, auto-restart the listener
+          if (jarvisModeRef.current && !isSpeakingRef.current && !isProcessingRef.current) {
+            setTimeout(() => {
+              if (jarvisModeRef.current && !isSpeakingRef.current && !isProcessingRef.current && !isListeningRef.current) {
+                try {
+                  recognition.start();
+                } catch (e) {
+                  // Already running
+                }
+              }
+            }, 300);
+          } else {
+            setSysStatus((prev) => (prev === "LISTENING" ? "STANDBY" : prev));
+          }
         };
 
         recognition.onresult = (event) => {
           try {
             const transcript = event.results[0][0].transcript;
-            handleSend(transcript);
+            const lowerText = transcript.toLowerCase().trim();
+            const hasWakeWord = lowerText.includes("jarvis");
+
+            if (!isOpenRef.current) {
+              // Background listening: open assistant if wake-word is detected
+              if (hasWakeWord) {
+                setIsOpen(true);
+                setSysStatus("PROCESSING");
+                const welcomeMsg = {
+                  sender: "ai",
+                  text: "[SYS_BOOT] Hello Operator, I am here. Jarvis activated. How can I assist you?",
+                  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+                setMessages(prev => [...prev, welcomeMsg]);
+                isSpeakingRef.current = true;
+                speakText(welcomeMsg.text);
+              }
+            } else {
+              // Active listening: process standard commands/queries
+              handleSend(transcript);
+            }
           } catch (err) {
             console.error("Speech recognition result parsing failed:", err);
           }
         };
 
         recognition.onerror = (event) => {
-          console.error("Speech recognition error:", event.error);
+          // 'no-speech' is a common silent warning, keep console clean
+          if (event.error !== "no-speech") {
+            console.warn("Speech recognition error status:", event.error);
+          }
           setIsListening(false);
-          setSysStatus("STANDBY");
+          
+          if (jarvisModeRef.current && !isSpeakingRef.current && !isProcessingRef.current) {
+            setTimeout(() => {
+              if (jarvisModeRef.current && !isSpeakingRef.current && !isProcessingRef.current && !isListeningRef.current) {
+                try {
+                  recognition.start();
+                } catch (e) {}
+              }
+            }, 1000);
+          } else {
+            setSysStatus("STANDBY");
+          }
         };
 
         recognitionRef.current = recognition;
+
+        // Attempt initial start for background wake word detection
+        if (jarvisModeRef.current) {
+          try {
+            recognition.start();
+          } catch (e) {}
+        }
       } catch (err) {
         console.error("Speech recognition instantiation failed:", err);
       }
     }
+
+    // Fallback: start listening on first click if blocked by browser policy initially
+    const handleGestureStart = () => {
+      if (
+        jarvisModeRef.current &&
+        !isListeningRef.current &&
+        !isSpeakingRef.current &&
+        !isProcessingRef.current &&
+        recognitionRef.current
+      ) {
+        try {
+          recognitionRef.current.start();
+        } catch (e) {
+          // Already running
+        }
+      }
+    };
+
+    window.addEventListener("click", handleGestureStart);
+    return () => {
+      window.removeEventListener("click", handleGestureStart);
+    };
   }, []);
 
   // Handle Text to Speech (TTS) safely with try-catch
   const speakText = (text) => {
     try {
-      if (!voiceEnabled || !window.speechSynthesis) return;
+      // Suspend recognition first to prevent feedback loops
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {}
+      }
+
+      if (!voiceEnabled || !window.speechSynthesis) {
+        isSpeakingRef.current = false;
+        if (jarvisModeRef.current && !isProcessingRef.current) {
+          setTimeout(() => {
+            if (jarvisModeRef.current && !isProcessingRef.current && !isListeningRef.current) {
+              try {
+                recognitionRef.current?.start();
+              } catch (e) {}
+            }
+          }, 300);
+        }
+        return;
+      }
 
       window.speechSynthesis.cancel(); // Cancel active speaking
 
@@ -102,9 +231,46 @@ export default function AIAssistant({ openAllProjects, closeAllProjects, isAllPr
 
       utterance.pitch = 0.9; // Cyberpunk pitch setting
       utterance.rate = 1.05; // Telemetry response rate
+
+      utterance.onstart = () => {
+        isSpeakingRef.current = true;
+      };
+
+      utterance.onend = () => {
+        isSpeakingRef.current = false;
+        if (jarvisModeRef.current && !isProcessingRef.current) {
+          setTimeout(() => {
+            if (jarvisModeRef.current && !isProcessingRef.current && !isListeningRef.current) {
+              try {
+                recognitionRef.current?.start();
+              } catch (e) {}
+            }
+          }, 400);
+        }
+      };
+
+      utterance.onerror = () => {
+        isSpeakingRef.current = false;
+        if (jarvisModeRef.current && !isProcessingRef.current) {
+          setTimeout(() => {
+            if (jarvisModeRef.current && !isProcessingRef.current && !isListeningRef.current) {
+              try {
+                recognitionRef.current?.start();
+              } catch (e) {}
+            }
+          }, 400);
+        }
+      };
+
       window.speechSynthesis.speak(utterance);
     } catch (err) {
       console.warn("Speech synthesis failed to execute:", err);
+      isSpeakingRef.current = false;
+      if (jarvisModeRef.current && !isProcessingRef.current) {
+        try {
+          recognitionRef.current?.start();
+        } catch (e) {}
+      }
     }
   };
 
@@ -116,9 +282,15 @@ export default function AIAssistant({ openAllProjects, closeAllProjects, isAllPr
 
     try {
       if (isListening) {
+        setJarvisMode(false);
         recognitionRef.current.stop();
+        setCommandFeedback("LISTENING PAUSED");
+        setTimeout(() => setCommandFeedback(""), 2000);
       } else {
+        setJarvisMode(true);
         recognitionRef.current.start();
+        setCommandFeedback("LISTENING ACTIVE");
+        setTimeout(() => setCommandFeedback(""), 2000);
       }
     } catch (err) {
       console.error("Failed to toggle speech recognition:", err);
@@ -267,6 +439,13 @@ export default function AIAssistant({ openAllProjects, closeAllProjects, isAllPr
   const handleSend = async (forcedText) => {
     const textToSend = forcedText || inputValue;
     if (!textToSend.trim()) return;
+
+    // Suspend speech recognition during processing
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+    }
 
     // Add user message
     const userMsg = {
@@ -533,11 +712,41 @@ User query: ${textToSend}`
               </div>
               
               {/* Status HUD */}
-              <div className="flex items-center gap-3">
-                <span className="text-[7px] text-gray-500 tracking-wider">
+              <div className="flex items-center gap-2">
+                <span className="text-[7px] text-gray-500 tracking-wider mr-1">
                   STATUS: <span className={sysStatus === "LISTENING" ? "text-red-400 font-bold" : sysStatus === "PROCESSING" ? "text-amber-400 font-bold" : "text-emerald-400"}>{sysStatus}</span>
                 </span>
                 
+                {/* Jarvis Wake-Word Continuous Listening Toggle */}
+                <button
+                  onClick={() => {
+                    const nextMode = !jarvisMode;
+                    setJarvisMode(nextMode);
+                    if (nextMode) {
+                      setCommandFeedback("JARVIS ACTIVE");
+                      setTimeout(() => setCommandFeedback(""), 2000);
+                      try {
+                        recognitionRef.current?.start();
+                      } catch (e) {}
+                    } else {
+                      setCommandFeedback("JARVIS MUTED");
+                      setTimeout(() => setCommandFeedback(""), 2000);
+                      try {
+                        recognitionRef.current?.stop();
+                      } catch (e) {}
+                    }
+                  }}
+                  className={`px-1.5 py-1 rounded-lg border transition-all cursor-pointer text-[8px] flex items-center gap-1.5 ${
+                    jarvisMode 
+                      ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400 font-bold shadow-[0_0_8px_rgba(16,185,129,0.25)] animate-pulse" 
+                      : "border-white/5 bg-white/[0.01] text-gray-500"
+                  }`}
+                  title={jarvisMode ? "Deactivate Jarvis Wake-Word Listener" : "Activate Jarvis Wake-Word Listener"}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${jarvisMode ? "bg-emerald-400 animate-ping" : "bg-gray-600"}`} style={{ animationDuration: '2s' }} />
+                  <span className="tracking-wider text-[8px]">JARVIS</span>
+                </button>
+
                 {/* TTS Toggle */}
                 <button
                   onClick={() => {
