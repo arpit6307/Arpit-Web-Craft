@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -37,7 +37,7 @@ const FrameScrollAnimation = ({ frameCount = 240 }) => {
   }, []);
 
   // GSAP scroll-driven frame animation (same reliable method as Hero)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!loaded) return;
 
     const canvas = canvasRef.current;

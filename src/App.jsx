@@ -10,6 +10,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider, ProtectedRoute } from './hooks/useAuth.jsx';
 
 gsap.registerPlugin(ScrollTrigger);
+gsap.config({ nullTargetWarn: false });
 
 // Lazy load non-critical sections for performance
 const About = lazy(() => import('./components/About'));

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion, AnimatePresence } from "framer-motion";
@@ -49,7 +49,7 @@ const Contact = () => {
     }
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!loaded) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
