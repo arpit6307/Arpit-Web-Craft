@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 // Get speech recognition constructor
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-export default function AIAssistant({ openAllProjects }) {
+export default function AIAssistant({ openAllProjects, closeAllProjects, isAllProjectsOpen }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -127,52 +127,62 @@ export default function AIAssistant({ openAllProjects }) {
     }
   };
 
+  const navigateAndScroll = (targetId) => {
+    // If all projects overlay is open, close it
+    if (isAllProjectsOpen && typeof closeAllProjects === "function") {
+      closeAllProjects();
+    }
+
+    // Check if we are on a non-home route
+    if (window.location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 350);
+    } else {
+      // If we are on home route, scroll after a brief timeout to let modal unmounting begin
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  };
+
   // Process custom system voice commands
   const processVoiceCommand = (text) => {
     const cmd = text.toLowerCase().trim();
 
     if (cmd.includes("show projects") || cmd.includes("open projects") || cmd.includes("view projects") || cmd.includes("portfolio") || cmd.includes("go to projects") || cmd.includes("go to project") || cmd.includes("go projects") || cmd.includes("go project") || cmd.includes("projects section") || cmd.includes("project section")) {
-      const el = document.getElementById("portfolio");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        setCommandFeedback("NAVIGATING: PORTFOLIO_GRID");
-        setTimeout(() => setCommandFeedback(""), 3000);
-        return true;
-      }
+      navigateAndScroll("portfolio");
+      setCommandFeedback("NAVIGATING: PORTFOLIO_GRID");
+      setTimeout(() => setCommandFeedback(""), 3000);
+      return true;
     }
 
     if (cmd.includes("show about") || cmd.includes("open about") || cmd.includes("view about") || cmd.includes("go to about") || cmd.includes("go about") || cmd.includes("about section")) {
-      const el = document.getElementById("about");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        setCommandFeedback("NAVIGATING: ABOUT_SECTION");
-        setTimeout(() => setCommandFeedback(""), 3000);
-        return true;
-      }
+      navigateAndScroll("about");
+      setCommandFeedback("NAVIGATING: ABOUT_SECTION");
+      setTimeout(() => setCommandFeedback(""), 3000);
+      return true;
     }
 
     if (cmd.includes("show services") || cmd.includes("open services") || cmd.includes("view services") || cmd.includes("go to services") || cmd.includes("go services") || cmd.includes("services section")) {
-      const el = document.getElementById("services");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        setCommandFeedback("NAVIGATING: SERVICES_CORE");
-        setTimeout(() => setCommandFeedback(""), 3000);
-        return true;
-      }
+      navigateAndScroll("services");
+      setCommandFeedback("NAVIGATING: SERVICES_CORE");
+      setTimeout(() => setCommandFeedback(""), 3000);
+      return true;
     }
 
     if (cmd.includes("show contact") || cmd.includes("open contact") || cmd.includes("view contact") || cmd.includes("send message") || cmd.includes("go to contact") || cmd.includes("go contact") || cmd.includes("contact section")) {
-      const el = document.getElementById("contact");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        setCommandFeedback("NAVIGATING: CONTACT_CHASSIS");
-        setTimeout(() => {
-          setCommandFeedback("");
-          const input = document.querySelector("#contact input[name='name']") || document.querySelector("#contact input[type='text']") || document.querySelector("#contact input");
-          if (input) input.focus();
-        }, 1000);
-        return true;
-      }
+      navigateAndScroll("contact");
+      setCommandFeedback("NAVIGATING: CONTACT_CHASSIS");
+      setTimeout(() => {
+        setCommandFeedback("");
+        const input = document.querySelector("#contact input[name='name']") || document.querySelector("#contact input[type='text']") || document.querySelector("#contact input");
+        if (input) input.focus();
+      }, 1000);
+      return true;
     }
 
     if (cmd.includes("open admin") || cmd.includes("login admin") || cmd.includes("admin panel") || cmd.includes("go to admin") || cmd.includes("go admin")) {
@@ -357,37 +367,25 @@ User query: ${textToSend}`
         
         // Execute dynamic AI-driven navigation triggers
         if (aiText.toLowerCase().includes("[goto_portfolio]")) {
-          const el = document.getElementById("portfolio");
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
-            setCommandFeedback("NAVIGATING: PORTFOLIO_GRID");
-            setTimeout(() => setCommandFeedback(""), 3000);
-          }
+          navigateAndScroll("portfolio");
+          setCommandFeedback("NAVIGATING: PORTFOLIO_GRID");
+          setTimeout(() => setCommandFeedback(""), 3000);
         } else if (aiText.toLowerCase().includes("[goto_about]")) {
-          const el = document.getElementById("about");
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
-            setCommandFeedback("NAVIGATING: ABOUT_SECTION");
-            setTimeout(() => setCommandFeedback(""), 3000);
-          }
+          navigateAndScroll("about");
+          setCommandFeedback("NAVIGATING: ABOUT_SECTION");
+          setTimeout(() => setCommandFeedback(""), 3000);
         } else if (aiText.toLowerCase().includes("[goto_services]")) {
-          const el = document.getElementById("services");
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
-            setCommandFeedback("NAVIGATING: SERVICES_CORE");
-            setTimeout(() => setCommandFeedback(""), 3000);
-          }
+          navigateAndScroll("services");
+          setCommandFeedback("NAVIGATING: SERVICES_CORE");
+          setTimeout(() => setCommandFeedback(""), 3000);
         } else if (aiText.toLowerCase().includes("[goto_contact]")) {
-          const el = document.getElementById("contact");
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
-            setCommandFeedback("NAVIGATING: CONTACT_CHASSIS");
-            setTimeout(() => {
-              setCommandFeedback("");
-              const input = document.querySelector("#contact input[name='name']") || document.querySelector("#contact input[type='text']") || document.querySelector("#contact input");
-              if (input) input.focus();
-            }, 1000);
-          }
+          navigateAndScroll("contact");
+          setCommandFeedback("NAVIGATING: CONTACT_CHASSIS");
+          setTimeout(() => {
+            setCommandFeedback("");
+            const input = document.querySelector("#contact input[name='name']") || document.querySelector("#contact input[type='text']") || document.querySelector("#contact input");
+            if (input) input.focus();
+          }, 1000);
         } else if (aiText.toLowerCase().includes("[goto_admin]")) {
           setCommandFeedback("SYS_REDIRECT: SECURE_LOGIN");
           setTimeout(() => {
